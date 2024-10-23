@@ -38,7 +38,13 @@ if __name__ == "__main__":
             if match:
                 line_count += 1
                 code = match.group(2)
-                file_size = int(match.group(3))
+                file_size_str = match.group(3)
+                
+                try:
+                    file_size = int(file_size_str)
+                except ValueError:
+                    printf(f"Invalid file size {file_size_str} in {line}")
+                    continue
 
                 log["file_size"] += file_size
 
