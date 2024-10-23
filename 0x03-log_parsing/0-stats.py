@@ -39,7 +39,7 @@ if __name__ == "__main__":
                 line_count += 1
                 code = match.group(2)
                 file_size_str = match.group(3)
-                
+
                 try:
                     file_size = int(file_size_str)
                 except ValueError:
