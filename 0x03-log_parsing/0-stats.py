@@ -6,7 +6,6 @@ Log Parsing Script
 import sys
 import re
 
-
 def output(log: dict) -> None:
     """
     Helper function to display stats
@@ -15,7 +14,6 @@ def output(log: dict) -> None:
     for code in sorted(log["code_frequency"]):
         if log["code_frequency"][code] > 0:
             print("{}: {}".format(code, log["code_frequency"][code]))
-
 
 if __name__ == "__main__":
     regex = re.compile(
@@ -43,8 +41,7 @@ if __name__ == "__main__":
                 try:
                     file_size = int(file_size_str)
                 except ValueError:
-                    printf(f"Invalid file size {file_size_str} in {line}")
-                    continue
+                    continue  # Skip lines with invalid file size
 
                 log["file_size"] += file_size
 
@@ -53,6 +50,7 @@ if __name__ == "__main__":
 
                 if line_count % 10 == 0:
                     output(log)
+
     except KeyboardInterrupt:
         output(log)
     finally:
