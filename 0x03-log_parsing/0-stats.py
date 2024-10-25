@@ -6,6 +6,7 @@ Log Parsing Script
 import sys
 import re
 
+
 def output(log: dict) -> None:
     """
     Helper function to display stats
@@ -14,6 +15,7 @@ def output(log: dict) -> None:
     for code in sorted(log["code_frequency"]):
         if log["code_frequency"][code] > 0:
             print("{}: {}".format(code, log["code_frequency"][code]))
+
 
 if __name__ == "__main__":
     regex = re.compile(
