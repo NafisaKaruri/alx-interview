@@ -5,15 +5,11 @@ Log Parsing Script
 
 import sys
 import re
-from typing import Dict
 
 
-def output(log: Dict[str, any]) -> None:
+def output(log: dict) -> None:
     """
-    Helper function to display stats.
-
-    Args:
-        log (Dict[str, any]): The log statistics to display.
+    Helper function to display stats
     """
     print("File size: {}".format(log["file_size"]))
     for code in sorted(log["code_frequency"]):
@@ -21,36 +17,13 @@ def output(log: Dict[str, any]) -> None:
             print("{}: {}".format(code, log["code_frequency"][code]))
 
 
-def parse_line(line: str, log: Dict[str, any]) -> None:
-    """
-    Parse a single log line and update the log statistics.
-
-    Args:
-        line (str): The log line to parse.
-        log (Dict[str, any]): The log statistics to update.
-    """
+if __name__ == "__main__":
     regex = re.compile(
         r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - '
         r'\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+\] '
         r'"GET /projects/260 HTTP/1.1" (\d{3}) (\d+)'
     )
 
-    match = regex.match(line)
-    if match:
-        code = match.group(2)
-        file_size_str = match.group(3)
-
-        try:
-            file_size = int(file_size_str)
-            log["file_size"] += file_size
-        except ValueError:
-            return  # Skip lines with invalid file size
-
-        if code in log["code_frequency"]:
-            log["code_frequency"][code] += 1
-
-
-if __name__ == "__main__":
     line_count = 0
     log = {
         "file_size": 0,
@@ -61,12 +34,25 @@ if __name__ == "__main__":
     try:
         for line in sys.stdin:
             line = line.strip()
-            parse_line(line, log)
-            line_count += 1
+            match = regex.match(line)
+            if match:
+                line_count += 1
+                code = match.group(2)
+                file_size_str = match.group(3)
 
-            if line_count % 10 == 0:
-                output(log)
+                try:
+                    file_size = int(file_size_str)
+                except ValueError:
+                    printf(f"Invalid file size {file_size_str} in {line}")
+                    continue
 
+                log["file_size"] += file_size
+
+                if code in log["code_frequency"]:
+                    log["code_frequency"][code] += 1
+
+                if line_count % 10 == 0:
+                    output(log)
     except KeyboardInterrupt:
         output(log)
     finally:
