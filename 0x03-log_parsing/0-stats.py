@@ -5,11 +5,15 @@ Log Parsing Script
 
 import sys
 import re
+from typing import Dict
 
 
-def output(log: dict) -> None:
+def output(log: Dict[str, any]) -> None:
     """
-    Helper function to display stats
+    Helper function to display stats.
+
+    Args:
+        log (Dict[str, any]): The log statistics to display.
     """
     print("File size: {}".format(log["file_size"]))
     for code in sorted(log["code_frequency"]):
@@ -17,13 +21,36 @@ def output(log: dict) -> None:
             print("{}: {}".format(code, log["code_frequency"][code]))
 
 
-if __name__ == "__main__":
+def parse_line(line: str, log: Dict[str, any]) -> None:
+    """
+    Parse a single log line and update the log statistics.
+
+    Args:
+        line (str): The log line to parse.
+        log (Dict[str, any]): The log statistics to update.
+    """
     regex = re.compile(
         r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}) - '
         r'\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d+\] '
         r'"GET /projects/260 HTTP/1.1" (\d{3}) (\d+)'
     )
 
+    match = regex.match(line)
+    if match:
+        code = match.group(2)
+        file_size_str = match.group(3)
+
+        try:
+            file_size = int(file_size_str)
+            log["file_size"] += file_size
+        except ValueError:
+            return  # Skip lines with invalid file size
+
+        if code in log["code_frequency"]:
+            log["code_frequency"][code] += 1
+
+
+if __name__ == "__main__":
     line_count = 0
     log = {
         "file_size": 0,
@@ -34,23 +61,11 @@ if __name__ == "__main__":
     try:
         for line in sys.stdin:
             line = line.strip()
-            match = regex.match(line)
-            if match:
-                line_count += 1
-                code = match.group(2)
-                file_size_str = match.group(3)
+            parse_line(line, log)
+            line_count += 1
 
-                try:
-                    file_size = int(file_size_str)
-                    log["file_size"] += file_size
-                except ValueError:
-                    continue  # Skip lines with invalid file size
-
-                if code in log["code_frequency"]:
-                    log["code_frequency"][code] += 1
-
-                if line_count % 10 == 0:
-                    output(log)
+            if line_count % 10 == 0:
+                output(log)
 
     except KeyboardInterrupt:
         output(log)
