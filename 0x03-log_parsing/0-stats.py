@@ -36,6 +36,7 @@ if __name__ == "__main__":
             line = line.strip()
             match = regex.match(line)
             if match:
+                line_count += 1
                 code = match.group(2)
                 file_size_str = match.group(3)
 
