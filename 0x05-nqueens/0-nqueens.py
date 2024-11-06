@@ -1,5 +1,7 @@
 #!/usr/bin/python3
+"""Solves the nqueens problem"""
 from sys import argv
+
 
 def is_safe(board, row, col, N):
     # Check if no queen is placed in the same column or diagonals
@@ -10,16 +12,18 @@ def is_safe(board, row, col, N):
             return False
     return True
 
+
 def solve_nqueens(board, row, N, solutions):
     if row == N:
         solutions.append([[i, board[i]] for i in range(N)])
         return
-    
+
     for col in range(N):
         if is_safe(board, row, col, N):
             board[row] = col
             solve_nqueens(board, row + 1, N, solutions)
             board[row] = -1  # Backtrack
+
 
 def main():
     if len(argv) != 2:
@@ -45,6 +49,7 @@ def main():
     # Print solutions
     for solution in solutions:
         print(solution)
+
 
 if __name__ == "__main__":
     main()
