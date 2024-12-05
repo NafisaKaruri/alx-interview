@@ -14,7 +14,7 @@ def island_perimeter(grid):
             grid is rectangular, with its width and height not exceeding 100
     The grid is completely surrounded by water
     There is only on island (or nothing).
-    The island doesn't have "lakes" (water inside that isn't connected to water)
+    The island doesn't have lakes (water inside that isn't connected to water)
     """
     perimeter = 0
     for i in range(len(grid)):
