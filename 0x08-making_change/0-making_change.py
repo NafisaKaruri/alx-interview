@@ -22,16 +22,12 @@ def makeChange(coins, total):
     if not coins or coins is None:
         return -1
 
-    dp = [float('inf')] * (total + 1)
-
-    dp[0] = 0
-
-    # Iterate through each coin denomination
+    change = 0
+    coins = sorted(coins)[::-1]
     for coin in coins:
-        for amount in range(coin, total + 1):
-            dp[amount] = min(dp[amount], dp[amount - coin] + 1)
-
-    if dp[total] == float('inf'):
-        return -1
-
-    return dp[total]
+        while coin <= total:
+            total -= coin
+            change += 1
+        if (total == 0):
+            return change
+    return -1
