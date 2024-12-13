@@ -1,75 +1,64 @@
 #!/usr/bin/python3
-"""prime game"""
-
-
-def sieve_of_eratosthenes(limit):
-    """
-    Generates a list of primes up to 'limit' using the Sieve of Eratosthenes.
-    """
-    sieve = [True] * (limit + 1)
-    sieve[0] = sieve[1] = False  # 0 and 1 are not prime numbers
-    for start in range(2, int(limit**0.5) + 1):
-        if sieve[start]:
-            for i in range(start * start, limit + 1, start):
-                sieve[i] = False
-    return [num for num, is_prime in enumerate(sieve) if is_prime]
+"""Module defining isWinner function for determining the winner."""
 
 
 def isWinner(x, nums):
+    """Determine who wins most rounds in the prime game.
+
+    Args:
+        x (int): Number of rounds.
+        nums (list): List of integers for each round's n.
+
+    Returns:
+        str: Winner's name ("Maria" or "Ben"), or None if tie.
     """
-    Determines the winner.
-    Maria always goes first, and both players play optimally.
-    """
-    if x <= 0 or nums is None or x != len(nums):
-        return None
+    mariaWinsCount = 0  # Count of Maria's wins
+    benWinsCount = 0  # Count of Ben's wins
 
-    ben_wins = 0
-    maria_wins = 0
+    for num in nums:
+        roundsSet = list(range(1, num + 1))
+        primesSet = primes_in_range(1, num)
 
-    # Precompute primes up to the maximum possible n in nums using the sieve
-    max_n = max(nums)
-    primes = sieve_of_eratosthenes(max_n)
+        if not primesSet:  # Ben wins if no primes
+            benWinsCount += 1
+            continue
 
-    for n in nums:
-        # Generate a list of available numbers (1 to n)
-        # and a list to mark removed numbers
-        available = [True] * (n + 1)
-        available[0] = available[1] = False  # 0 and 1 are not prime
+        isMariaTurns = True  # Flag for Maria's turn
 
-        turn = 0  # 0 for Maria, 1 for Ben
-        moves_left = 0  # Counter for available primes
-
-        # Count the primes <= n
-        for prime in primes:
-            if prime <= n:
-                moves_left += 1
-            else:
+        while(True):
+            if not primesSet:  # If no primes left, the current player loses
+                if isMariaTurns:
+                    benWinsCount += 1
+                else:
+                    mariaWinsCount += 1
                 break
 
-        # Simulate the game
-        while moves_left > 0:
-            # Find the next available prime number
-            for i in range(2, n + 1):
-                if available[i]:
-                    prime = i
-                    break
+            smallestPrime = primesSet.pop(0)
+            roundsSet.remove(smallestPrime)
 
-            # Remove multiples of the chosen prime
-            for j in range(prime, n + 1, prime):
-                available[j] = False
+            roundsSet = [x for x in roundsSet if x % smallestPrime != 0]
 
-            # Toggle the turn (Maria -> Ben or Ben -> Maria)
-            turn = 1 - turn
-            moves_left -= 1
+            isMariaTurns = not isMariaTurns  # Switch turns
 
-        # If turn is 0, it means Ben made the last valid move, so Maria loses.
-        if turn == 1:
-            maria_wins += 1
-        else:
-            ben_wins += 1
-
-    if ben_wins > maria_wins:
-        return "Ben"
-    if maria_wins > ben_wins:
+    if mariaWinsCount > benWinsCount:
         return "Maria"
-    return None
+
+    if mariaWinsCount < benWinsCount:
+        return "Ben"
+
+    return None  # Return None if there is a tie
+
+
+def is_prime(n):
+    """Return True if n is prime, else False."""
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+
+def primes_in_range(start, end):
+    """Return list of primes in the range [start, end]."""
+    return [n for n in range(start, end + 1) if is_prime(n)]
