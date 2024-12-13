@@ -12,6 +12,9 @@ def isWinner(x, nums):
     Returns:
         str: Winner's name ("Maria" or "Ben"), or None if tie.
     """
+    if x <= 0 or nums is None or x != len(nums):
+        return None
+
     mariaWinsCount = 0  # Count of Maria's wins
     benWinsCount = 0  # Count of Ben's wins
 
